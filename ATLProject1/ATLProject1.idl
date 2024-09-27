@@ -1,0 +1,50 @@
+// ATLProject1.idl: IDL-Quelle für ATLProject1
+//
+
+// Diese Datei wird mit dem MIDL-Tool bearbeitet,
+// generieren die Typbibliothek (ATLProject1.tlb) und den Marshallingcode.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	object,
+	uuid(62930ae6-54c3-4870-8e3e-dfd6c2084892),
+	dual,
+	oleautomation,
+	nonextensible,
+	pointer_default(unique)
+]
+interface IATLSimpleObject : IDispatch
+{
+	typedef enum FocusPolicy {
+		NoFocus = 0,
+		TabFocus = 1,
+		ClickFocus = 2,
+		StrongFocus = 11,
+		WheelFocus = 15
+	} FocusPolicy;
+
+	[id(2)] HRESULT Reverse2([in] BSTR Str, [out, retval] BSTR* retval);
+	[id(3)] HRESULT Test([in] FocusPolicy fp, [out] LONG* result);
+	[id(4)] HRESULT Test2([in] FocusPolicy fp, [out] FocusPolicy* fpOut );
+	[id(5)] HRESULT Test3([in] SAFEARRAY(long) arrLong, [in] SAFEARRAY(FocusPolicy) arrEnum, [out] SAFEARRAY(double) *arrDouble);
+
+};
+[
+	uuid(97bb14db-8756-4cf1-8f69-d7057e6a27b0),
+	version(1.0),
+]
+library ATLProject1Lib
+{
+	importlib("stdole2.tlb");
+	[
+		uuid(a109a777-b11f-4a63-bbfe-a132bd764026)
+	]
+	coclass ATLSimpleObject
+	{
+		[default] interface IATLSimpleObject;
+	};
+};
+
+import "shobjidl.idl";

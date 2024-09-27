@@ -1,0 +1,15 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs/EnumComType
+/ATLProject1/x64
+/EnumComType/.vs
+/EnumComType/bin/Debug/net8.0
+/EnumComType/obj
+/x64/Debug
+*.aps
+/ATLProject1/ATLProject1_i.c
+/ATLProject1/ATLProject1_i.h
+/ATLProject1/ATLProject1_p.c
+/ATLProject1/dlldata.c

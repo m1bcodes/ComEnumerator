@@ -8,6 +8,7 @@ class Program
 
     static void Main(string[] args)
     {
+        string progId = "ATLProject1.ATLSimpleObject.1";
         // Initialize COM
         //int hr = CoInitialize(IntPtr.Zero);
         //if (hr != 0)
@@ -21,7 +22,7 @@ class Program
 
         TypeLibEnumerator t = new TypeLibEnumerator();
 
-        t.OpenFromID("ATLProject1.ATLSimpleObject.1");
+        t.OpenFromID(progId);
 
         Console.WriteLine(t.LibDocumentation());
 
@@ -148,6 +149,10 @@ class Program
 
         Console.WriteLine("\nUsed return types:");
         foreach (var it in returnTypes) Console.WriteLine(it);
+
+        t = new TypeLibEnumerator();
+        t.OpenFromID(progId);
+        var ed = t.EnumDictionary();
     }
 }
 

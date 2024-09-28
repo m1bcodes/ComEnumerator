@@ -18,7 +18,7 @@ public interface IDispatch
 
 namespace EnumComType
 {
-    public static class TypeLibHelper
+    public class TypeLibHelper
     {
         public static string VartypeToString(VarEnum vartype)
         {
@@ -162,19 +162,6 @@ namespace EnumComType
 
     public class TypeLibEnumerator
     {
-        //private ITypeLib typeLib_;
-        //private int nofTypeInfos_;
-        //private int curTypeInfo_;
-        //private ITypeInfo curITypeInfo_;
-        //private TYPEATTR curTypeAttr_;
-        //private int curFunc_;
-        //private int curVar_;
-        //private int curFuncParam_;
-        //private FUNCDESC curFuncDesc_;
-        //private VARDESC curVarDesc_;
-        //private string[] funcNames_;
-        //private int nofFuncNames_;
-
         public TypeLibEnumerator()
         {
            // OleInitialize(IntPtr.Zero);
@@ -585,6 +572,32 @@ namespace EnumComType
         public int NofOptionalParameters()
         {
             return this.curFuncDesc.cParamsOpt;
+        }
+
+        public Dictionary<string, Dictionary<string, int>> EnumDictionary()
+        {
+            var rv = new Dictionary<string, Dictionary<string, int>>();
+            while (this.NextTypeInfo())
+            {
+                string typeDoc = this.TypeDocumentation();
+                if (this.IsTypeEnum())
+                {
+                    var en = new Dictionary<string, int>();
+                    rv[typeDoc] = en;
+                    while (this.NextVariable())
+                    {
+                        TypeLibEnumerator.VARIABLEKIND vk = this.VariableKind();
+                        if (vk == TypeLibEnumerator.VARIABLEKIND.const_)
+                        {
+                            if(int.TryParse(this.ConstValue(), out int enumValue))
+                            {
+                                en[this.VariableName()] = enumValue;
+                            }
+                        }
+                    }
+                }
+            }
+            return rv;
         }
 
         private int typeInfoCount = 0;

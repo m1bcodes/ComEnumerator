@@ -667,7 +667,7 @@ namespace ComTypeHelper
             }
         }
 
-        public static System.Dynamic.ExpandoObject CreateComWrapper(string progId)
+        public static System.Dynamic.ExpandoObject CreateComWrapper(string fieldName, string progId)
         {
             Type comType = null;
             dynamic api = null;
@@ -679,7 +679,7 @@ namespace ComTypeHelper
             var edd = t.EnumDictionary();
 
             dynamic exo = new System.Dynamic.ExpandoObject();
-            exo.api = api;
+            ((IDictionary<String, Object>)exo).Add(fieldName, api);
             ComContainer.AddEnumDictionary(edd, exo);
             return exo;
         }

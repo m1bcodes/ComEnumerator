@@ -170,7 +170,7 @@ class Program
         dynamic enumContainer = ComContainer.createEnumContainer(ed);
         Console.WriteLine("FocusPolicy.StrongFocus = {0}", enumContainer.FocusPolicy.StrongFocus);
 
-        dynamic api = ComContainer.CreateComWrapper(progId);
+        dynamic api = ComContainer.CreateComWrapper("api", progId);
         Console.WriteLine("api.FocusPolicy.StrongFocus = {0}", api.FocusPolicy.StrongFocus);
         Console.WriteLine("api.Reverse2 = {0}", api.api.Reverse2("Hallo"));
     }

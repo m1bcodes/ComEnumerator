@@ -20,8 +20,6 @@
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
 
-using System.Reflection.Emit;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 
@@ -646,22 +644,46 @@ namespace ComTypeHelper
         ELEMDESC[] elemDescArray;
     }
 
-    static class EnumContainer
+    static class ComContainer
     {
         public static System.Dynamic.ExpandoObject createEnumContainer(
             Dictionary<string, Dictionary<string, int>> enumDict)
         {
             dynamic exoContainer = new System.Dynamic.ExpandoObject();
+            AddEnumDictionary(enumDict, exoContainer);
+            return exoContainer;
+        }
+
+        public static void AddEnumDictionary(Dictionary<string, Dictionary<string, int>> enumDict,
+            dynamic exoContainer)
+        {
             foreach (var edd in enumDict)
             {
                 dynamic exoType = new System.Dynamic.ExpandoObject();
-                foreach(var ed in edd.Value)
+                foreach (var ed in edd.Value)
                 {
                     ((IDictionary<String, Object>)exoType).Add(ed.Key, ed.Value);
-                }               
+                }
                 ((IDictionary<String, Object>)exoContainer).Add(edd.Key, exoType);
             }
-            return exoContainer;
+        }
+
+        public static System.Dynamic.ExpandoObject CreateComWrapper(string progId)
+        {
+            Type comType = null;
+            dynamic api = null;
+
+            comType = Type.GetTypeFromProgID(progId);
+            api = Activator.CreateInstance(comType);
+
+            TypeLibEnumerator t = new TypeLibEnumerator();
+            t.OpenFromID(progId);
+            var edd = t.EnumDictionary();
+
+            dynamic exo = new System.Dynamic.ExpandoObject();
+            exo.api = api;
+            ComContainer.AddEnumDictionary(edd, exo);
+            return exo;
         }
     }
 

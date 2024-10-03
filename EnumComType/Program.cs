@@ -23,7 +23,6 @@
 
 using ComTypeHelper;
 using System.Runtime.InteropServices;
-using System.Xml.Linq;
 
 class Program
 {
@@ -178,7 +177,11 @@ class Program
         t.OpenFromID(progId);
         var ed = t.EnumDictionary();
 
-        dynamic enumContainer = EnumContainer.createEnumContainer(ed);
+        dynamic enumContainer = ComContainer.createEnumContainer(ed);
         Console.WriteLine("FocusPolicy.StrongFocus = {0}", enumContainer.FocusPolicy.StrongFocus);
+
+        dynamic api = ComContainer.CreateComWrapper(progId);
+        Console.WriteLine("api.FocusPolicy.StrongFocus = {0}", api.FocusPolicy.StrongFocus);
+        Console.WriteLine("api.Reverse2 = {0}", api.api.Reverse2("Hallo"));
     }
 }

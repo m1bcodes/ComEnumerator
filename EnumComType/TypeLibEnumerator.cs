@@ -184,16 +184,9 @@ namespace ComTypeHelper
 
     public class TypeLibEnumerator
     {
-        public TypeLibEnumerator()
+        public TypeLibEnumerator(string progId)
         {
-           // OleInitialize(IntPtr.Zero);
-        }
-
-        [DllImport("Ole32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        public static extern void OleInitialize(IntPtr pvReserved);
-
-        public void OpenFromID(string progId)
-        {
+            // OleInitialize(IntPtr.Zero);
             Object so = Activator.CreateInstance(Type.GetTypeFromProgID(progId));
             IDispatch dispatch = (IDispatch)so;
 
@@ -202,7 +195,13 @@ namespace ComTypeHelper
 
             typeInfo.GetContainingTypeLib(out this.ppTLB, out int pIndex);
             this.typeInfoCount = ppTLB.GetTypeInfoCount();
+
+            this.funcNames = Array.Empty<string>();
+            this.elemDescArray = Array.Empty<ELEMDESC>();
         }
+
+        [DllImport("Ole32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern void OleInitialize(IntPtr pvReserved);
 
         public bool NextTypeInfo()
         {
@@ -676,8 +675,7 @@ namespace ComTypeHelper
             comType = Type.GetTypeFromProgID(progId);
             api = Activator.CreateInstance(comType);
 
-            TypeLibEnumerator t = new TypeLibEnumerator();
-            t.OpenFromID(progId);
+            TypeLibEnumerator t = new TypeLibEnumerator(progId);
             var edd = t.EnumDictionary();
 
             dynamic exo = new System.Dynamic.ExpandoObject();

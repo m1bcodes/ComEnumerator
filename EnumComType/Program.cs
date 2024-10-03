@@ -43,9 +43,7 @@ class Program
         HashSet<string> outputTypes = new HashSet<string>();
         HashSet<string> returnTypes = new HashSet<string>();
 
-        TypeLibEnumerator t = new TypeLibEnumerator();
-
-        t.OpenFromID(progId);
+        TypeLibEnumerator t = new TypeLibEnumerator(progId);
 
         Console.WriteLine(t.LibDocumentation());
 
@@ -80,13 +78,6 @@ class Program
             {
                 Console.WriteLine();
                 Console.WriteLine("  Function     : " + t.FunctionName());
-
-                string funcName = t.FunctionName();
-                if (funcName == "Reverse2")
-                {
-                    int i = 0;
-                }
-
                 Console.WriteLine("    returns    : " + t.ReturnType());
                 returnTypes.Add(t.ReturnType());
 
@@ -173,8 +164,7 @@ class Program
         Console.WriteLine("\nUsed return types:");
         foreach (var it in returnTypes) Console.WriteLine(it);
 
-        t = new TypeLibEnumerator();
-        t.OpenFromID(progId);
+        t = new TypeLibEnumerator(progId);
         var ed = t.EnumDictionary();
 
         dynamic enumContainer = ComContainer.createEnumContainer(ed);

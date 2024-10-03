@@ -173,5 +173,9 @@ class Program
         dynamic api = ComContainer.CreateComWrapper("api", progId);
         Console.WriteLine("api.FocusPolicy.StrongFocus = {0}", api.FocusPolicy.StrongFocus);
         Console.WriteLine("api.Reverse2 = {0}", api.api.Reverse2("Hallo"));
+
+        Dictionary<string,int> fpDict = ComContainer.EnumToDictionary(api.FocusPolicy);
+        string[] keys = fpDict.Keys.ToArray<string>();
+        int[] vals = fpDict.Values.ToArray<int>();
     }
 }

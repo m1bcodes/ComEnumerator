@@ -683,6 +683,16 @@ namespace ComTypeHelper
             ComContainer.AddEnumDictionary(edd, exo);
             return exo;
         }
+
+        public static Dictionary<string, int> EnumToDictionary(System.Dynamic.ExpandoObject exo)
+        {
+            var result = new Dictionary<string, int>();
+            foreach(var d in (IDictionary<string, object>)exo)
+            {
+                result[d.Key] = (int)d.Value;
+            }
+            return result;
+        }
     }
 
 }

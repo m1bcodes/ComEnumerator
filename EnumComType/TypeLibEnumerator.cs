@@ -20,6 +20,8 @@
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
 
+using System.Reflection.Emit;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 
@@ -643,4 +645,142 @@ namespace EnumComType
         private int paramCount;
         ELEMDESC[] elemDescArray;
     }
+
+    public class EnumGenerator
+    {
+        public static System.Dynamic.ExpandoObject createEnumContainer(
+            Dictionary<string, Dictionary<string, int>> enumDict)
+        {
+            dynamic exoContainer = new System.Dynamic.ExpandoObject();
+            foreach (var edd in enumDict)
+            {
+                dynamic exoType = new System.Dynamic.ExpandoObject();
+                foreach(var ed in edd.Value)
+                {
+                    ((IDictionary<String, Object>)exoType).Add(ed.Key, ed.Value);
+                }               
+                ((IDictionary<String, Object>)exoContainer).Add(edd.Key, exoType);
+            }
+            return exoContainer;
+        }
+
+        public static dynamic CreateEnumSimulator(Dictionary<string, Dictionary<string, int>> enumDict)
+        {
+            AssemblyName assemblyName = new AssemblyName("DynamicAssembly");
+            AssemblyBuilder assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
+
+            // Create a module
+            ModuleBuilder moduleBuilder = assemblyBuilder.DefineDynamicModule("MainModule");
+
+            // Define a public class named "Person"
+            TypeBuilder typeBuilder = moduleBuilder.DefineType("Person", TypeAttributes.Public);
+
+            //// Create a public property "Name" of type string
+            //CreateProperty(typeBuilder, "Name", typeof(string));
+
+            //// Create a public property "Age" of type int
+            //CreateProperty(typeBuilder, "Age", typeof(int));
+
+            foreach(var edd in enumDict)
+            {
+                TypeBuilder typeBuilder2 = moduleBuilder.DefineType("Type_"+edd.Key, TypeAttributes.Public);
+
+
+                foreach (var ed in edd.Value)
+                {
+                    // CreateFixedValuePropertyInt(typeBuilder, edd.Key+"_"+ed.Key, ed.Value);
+                    CreateFixedValuePropertyInt(typeBuilder2, ed.Key, ed.Value);
+                }
+                Type personType2 = typeBuilder2.CreateType();
+                CreateProperty(typeBuilder, edd.Key, personType2);
+            }
+            //CreateFixedValuePropertyInt(typeBuilder, "Value1", 1);
+            //CreateFixedValuePropertyInt(typeBuilder, "Value2", 2);
+
+            // Create the type
+            Type personType = typeBuilder.CreateType();
+
+            // Instantiate the class dynamically
+            //object personInstance = Activator.CreateInstance(personType);
+
+            //// Set property values using reflection
+            //PropertyInfo nameProperty = personType.GetProperty("Name");
+            //PropertyInfo ageProperty = personType.GetProperty("Age");
+
+            //nameProperty.SetValue(personInstance, "John Doe");
+            //ageProperty.SetValue(personInstance, 30);
+
+            //// Get property values using reflection
+            //Console.WriteLine($"Name: {nameProperty.GetValue(personInstance)}");
+            //Console.WriteLine($"Age: {ageProperty.GetValue(personInstance)}");
+
+            dynamic personInstance = Activator.CreateInstance(personType);
+            return personInstance;
+
+            //personInstance.Name = "Hallo";
+            //personInstance.Age = 42;
+
+            //Console.WriteLine($"Name {personInstance.Name} age {personInstance.Age}");
+
+            //Console.WriteLine("Value 1 = {0}", personInstance.Value1);
+            //Console.WriteLine("Value 2 = {0}", personInstance.Value2);
+
+
+        }
+
+        private static void CreateProperty(TypeBuilder typeBuilder, string propertyName, Type propertyType)
+        {
+            // Define a private field
+            FieldBuilder fieldBuilder = typeBuilder.DefineField("_" + propertyName.ToLower(), propertyType, FieldAttributes.Private);
+
+            // Define the property
+            PropertyBuilder propertyBuilder = typeBuilder.DefineProperty(propertyName, PropertyAttributes.HasDefault, propertyType, null);
+
+            // Define the "get" accessor
+            MethodBuilder getMethodBuilder = typeBuilder.DefineMethod("get_" + propertyName,
+                MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig,
+                propertyType, Type.EmptyTypes);
+
+            ILGenerator getIL = getMethodBuilder.GetILGenerator();
+            getIL.Emit(OpCodes.Ldarg_0);
+            getIL.Emit(OpCodes.Ldfld, fieldBuilder);
+            getIL.Emit(OpCodes.Ret);
+
+            // Define the "set" accessor
+            MethodBuilder setMethodBuilder = typeBuilder.DefineMethod("set_" + propertyName,
+                MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig,
+                null, new[] { propertyType });
+
+            ILGenerator setIL = setMethodBuilder.GetILGenerator();
+            setIL.Emit(OpCodes.Ldarg_0);
+            setIL.Emit(OpCodes.Ldarg_1);
+            setIL.Emit(OpCodes.Stfld, fieldBuilder);
+            setIL.Emit(OpCodes.Ret);
+
+            // Map the "get" and "set" accessors to the property
+            propertyBuilder.SetGetMethod(getMethodBuilder);
+            propertyBuilder.SetSetMethod(setMethodBuilder);
+        }
+
+        private static void CreateFixedValuePropertyInt(TypeBuilder typeBuilder, string propertyName, int value)
+        {
+            var propertyType = typeof(int);
+
+            // Define the property
+            PropertyBuilder propertyBuilder = typeBuilder.DefineProperty(propertyName, PropertyAttributes.HasDefault, propertyType, null);
+
+            // Define the "get" accessor
+            MethodBuilder getMethodBuilder = typeBuilder.DefineMethod("get_" + propertyName,
+                MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig,
+                propertyType, Type.EmptyTypes);
+
+            ILGenerator getIL = getMethodBuilder.GetILGenerator();
+            getIL.Emit(OpCodes.Ldc_I4, value);
+            getIL.Emit(OpCodes.Ret);
+
+            // Map the "get" and "set" accessors to the property
+            propertyBuilder.SetGetMethod(getMethodBuilder);
+        }
+    }
+
 }

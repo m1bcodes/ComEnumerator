@@ -23,6 +23,7 @@
 
 using EnumComType;
 using System.Runtime.InteropServices;
+using System.Xml.Linq;
 
 class Program
 {
@@ -176,6 +177,11 @@ class Program
         t = new TypeLibEnumerator();
         t.OpenFromID(progId);
         var ed = t.EnumDictionary();
+
+        dynamic enumContainer = EnumGenerator.createEnumContainer(ed);
+        Console.WriteLine("FocusPolicy.StrongFocus = {0}", enumContainer.FocusPolicy.StrongFocus);
+        //dynamic enumSim = EnumGenerator.CreateEnumSimulator(ed);
+        //Console.WriteLine("FocusPolicy.StrongFocus = {0}", enumSim.FocusPolicy.StrongFocus);
     }
 }
 
